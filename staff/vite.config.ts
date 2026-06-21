@@ -7,11 +7,11 @@ export default defineConfig({
     port: 5175,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'https://dine-in-order-api.onrender.com',
         changeOrigin: true,
       },
       '/ws': {
-        target: 'ws://localhost:3000',
+        target: 'wss://dine-in-order-api.onrender.com',
         ws: true,
       },
     },
