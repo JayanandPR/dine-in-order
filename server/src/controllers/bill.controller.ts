@@ -35,9 +35,10 @@ export const generateBill = asyncHandler(async (req: Request, res: Response) => 
 
 // GET /api/bills/table/:tableId — customer views their bill
 export const getTableBill = asyncHandler(async (req: Request, res: Response) => {
-  const bill = await BillModel.findOne({ tableId: req.params.tableId, isPaid: false })
+  const bill = await BillModel.findOne({ tableId: req.params.tableId })
+    .sort({ generatedAt: -1 }) // get most recent
     .populate('orderId');
-  if (!bill) { sendError(res, 'No pending bill', 404); return; }
+  if (!bill) { sendError(res, 'No bill found', 404); return; }
   sendSuccess(res, bill);
 });
 

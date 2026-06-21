@@ -104,6 +104,12 @@ const OrderHistory = () => {
           ))
         )}
 
+        {/* Back to menu button */}
+        <a href={`/menu?table=${tableId}&restaurant=${restaurantId}`}
+          style={{ display: 'block', textAlign: 'center', padding: '0.75rem', background: '#2d3748', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontWeight: 600, marginBottom: '1rem' }}>
+          ← Back to Menu
+        </a>
+
         {/* Rating section */}
         {bill?.isPaid && !rated && (
           <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.25rem', marginTop: '1rem' }}>
