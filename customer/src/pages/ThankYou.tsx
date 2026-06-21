@@ -1,5 +1,6 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import api from '../api';
 
 const ThankYou = () => {
   const [params] = useSearchParams();
@@ -7,6 +8,15 @@ const ThankYou = () => {
   const tableId = params.get('table');
   const restaurantId = params.get('restaurant');
   const [count, setCount] = useState(5);
+  const [billId, setBillId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (tableId) {
+      api.get(`/bills/table/${tableId}`)
+        .then(r => setBillId(r.data.data?._id))
+        .catch(() => {});
+    }
+  }, [tableId]);
 
   useEffect(() => {
     if (count === 0) {
@@ -29,9 +39,15 @@ const ThankYou = () => {
         </p>
       </div>
       <button onClick={() => navigate(`/orders?table=${tableId}&restaurant=${restaurantId}`)}
-        style={{ padding: '0.75rem 2rem', background: '#2d3748', color: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 600, fontSize: '1rem' }}>
+        style={{ padding: '0.75rem 2rem', background: '#2d3748', color: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 600, fontSize: '1rem', marginBottom: '0.75rem', width: '100%', maxWidth: '280px' }}>
         View Order Summary
       </button>
+      {billId && (
+        <a href={`/invoice/${billId}`}
+          style={{ display: 'block', padding: '0.75rem 2rem', background: '#276749', color: '#fff', borderRadius: '10px', fontWeight: 600, fontSize: '1rem', textDecoration: 'none', width: '100%', maxWidth: '280px', boxSizing: 'border-box' }}>
+          🧾 View & Download Invoice
+        </a>
+      )}
     </div>
   );
 };

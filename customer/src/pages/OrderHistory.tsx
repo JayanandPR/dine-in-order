@@ -131,6 +131,16 @@ const OrderHistory = () => {
             {ratingMsg}
           </div>
         )}
+
+        {/* Invoice link — show if bill exists */}
+        {bill && (
+          <div style={{ margin: '1rem 0' }}>
+            <a href={`/invoice/${bill._id}`}
+              style={{ display: 'block', textAlign: 'center', padding: '0.75rem', background: '#ebf8ff', color: '#2b6cb0', borderRadius: '10px', textDecoration: 'none', fontWeight: 600, border: '1px solid #90cdf4' }}>
+              🧾 View Invoice
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );

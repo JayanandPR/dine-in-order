@@ -95,3 +95,14 @@ export const getRestaurantBills = asyncHandler(async (req: Request, res: Respons
     .sort({ generatedAt: -1 });
   sendSuccess(res, bills);
 });
+
+// GET /api/bills/:billId/invoice — get full invoice details
+export const getInvoice = asyncHandler(async (req: Request, res: Response) => {
+  const bill = await BillModel.findById(req.params.billId)
+    .populate('orderId')
+    .populate('tableId', 'tableNo')
+    .populate('restaurantId', 'name address contactNumber contactEmail');
+
+  if (!bill) { sendError(res, 'Bill not found', 404); return; }
+  sendSuccess(res, bill);
+});
