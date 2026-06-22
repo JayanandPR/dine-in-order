@@ -46,6 +46,14 @@ const Login = () => {
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
+
+        <p style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.875rem', color: '#718096' }}>
+          Don't have an account?{' '}
+          <a href="/register" style={{ color: '#2d3748', fontWeight: 600, textDecoration: 'none' }}>
+            Register
+          </a>
+        </p>
+
       </div>
     </div>
   );
