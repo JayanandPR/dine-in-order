@@ -17,8 +17,8 @@ const dietDot = (d: string): React.CSSProperties => ({
 const Menu = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const tableId = params.get('table');
-  const restaurantId = params.get('restaurant');
+  const restaurantId = params.get('restaurant') || sessionStorage.getItem('restaurantId');
+  const tableId = params.get('table') || sessionStorage.getItem('tableId');
 
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);

@@ -12,10 +12,16 @@ const Restaurant = () => {
   const [exists, setExists] = useState(false);
   const [msg, setMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [qrCode, setQrCode] = useState<string>('');
+  const [qrLoading, setQrLoading] = useState(false);
 
   useEffect(() => {
     api.get('/restaurants/mine').then(({ data }) => {
-      if (data.data) { setForm(data.data); setExists(true); }
+      if (data.data) {
+        setForm(data.data);
+        setExists(true);
+        if (data.data.generalQrCode) setQrCode(data.data.generalQrCode);
+      }
     }).catch(() => {});
   }, []);
 
@@ -34,6 +40,25 @@ const Restaurant = () => {
       setMsg(err.response?.data?.message || 'Error');
     } finally { setLoading(false); }
   };
+
+  const generateQR = async () => {
+    setQrLoading(true);
+    try {
+      const { data } = await api.post('/restaurants/mine/qr');
+      setQrCode(data.data.qrCode);
+      setMsg('General QR generated!');
+    } catch (err: any) {
+      setMsg(err.response?.data?.message || 'Error generating QR');
+    } finally { setQrLoading(false); }
+  };
+
+  const downloadQR = () => {
+    const a = document.createElement('a');
+    a.href = qrCode;
+    a.download = 'restaurant-qr.png';
+    a.click();
+  };
+  
 
   const field = (label: string, name: string, type = 'text') => (
     <div style={{ marginBottom: '1rem' }}>
@@ -81,6 +106,36 @@ const Restaurant = () => {
             style={{ padding: '0.7rem 2rem', background: '#2d3748', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 500 }}>
             {loading ? 'Saving...' : exists ? 'Update' : 'Create Restaurant'}
           </button>
+
+          {exists && (
+            <div style={{ marginTop: '2rem', padding: '1.5rem', background: '#f7fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+              <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>General QR Code</h3>
+              <p style={{ color: '#718096', fontSize: '0.875rem', marginBottom: '1rem' }}>
+                This QR takes customers to your menu homepage. Place it at the restaurant entrance or on tables without individual QR codes.
+              </p>
+              {qrCode ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.75rem' }}>
+                  <img src={qrCode} alt="General QR" style={{ width: '160px', height: '160px', border: '1px solid #e2e8f0', borderRadius: '8px' }} />
+                  <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <button onClick={downloadQR}
+                      style={{ padding: '0.5rem 1.25rem', background: '#48bb78', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 500 }}>
+                      ⬇ Download QR
+                    </button>
+                    <button onClick={generateQR} disabled={qrLoading}
+                      style={{ padding: '0.5rem 1.25rem', background: '#718096', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 500 }}>
+                      🔄 Regenerate
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button onClick={generateQR} disabled={qrLoading}
+                  style={{ padding: '0.6rem 1.5rem', background: '#2d3748', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 500 }}>
+                  {qrLoading ? 'Generating...' : '✨ Generate QR'}
+                </button>
+              )}
+            </div>
+          )}
+
         </form>
       </div>
     </div>

@@ -15,6 +15,7 @@ export interface IRestaurantDocument extends Document {
   logo?: string;
   createdAt: Date;
   updatedAt: Date;
+  generalQrCode: String;
 }
 
 const RestaurantSchema = new Schema<IRestaurantDocument>(
@@ -31,6 +32,7 @@ const RestaurantSchema = new Schema<IRestaurantDocument>(
     averageRating: { type: Number, default: 0, min: 0, max: 5 },
     noOfTables:    { type: Number, default: 0 },
     logo:          { type: String },
+    generalQrCode: { type: String },
   },
   { timestamps: true }
 );
