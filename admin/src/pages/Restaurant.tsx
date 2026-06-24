@@ -2,7 +2,7 @@ import { useEffect, useState, FormEvent } from 'react';
 import api from '../api';
 
 const DIET_TYPES = ['veg', 'non-veg', 'both'];
-const CUISINE_TYPES = ['indian', 'chinese', 'italian', 'continental', 'multi'];
+const CUISINE_TYPES = ['indian', 'chinese', 'italian', 'continental', 'multi', 'custom'];
 
 const inputStyle: React.CSSProperties = { width: '100%', padding: '0.6rem 0.8rem', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '0.95rem', boxSizing: 'border-box' };
 const labelStyle: React.CSSProperties = { display: 'block', marginBottom: '0.3rem', fontWeight: 500, fontSize: '0.875rem', color: '#4a5568' };
@@ -97,9 +97,31 @@ const Restaurant = () => {
             </div>
             <div>
               <label style={labelStyle}>Cuisine Type</label>
-              <select name="cuisineType" value={form.cuisineType} onChange={handleChange} style={inputStyle}>
-                {CUISINE_TYPES.map(c => <option key={c} value={c}>{c}</option>)}
+              <select name="cuisineType"
+                value={CUISINE_TYPES.includes(form.cuisineType) ? form.cuisineType : 'custom'}
+                onChange={e => {
+                  if (e.target.value === 'custom') {
+                    setForm(prev => ({ ...prev, cuisineType: '' }));
+                  } else {
+                    setForm(prev => ({ ...prev, cuisineType: e.target.value }));
+                  }
+                }}
+                style={inputStyle}>
+                {CUISINE_TYPES.map(c => (
+                  <option key={c} value={c} style={{ textTransform: 'capitalize' }}>
+                    {c === 'custom' ? '+ Add custom...' : c}
+                  </option>
+                ))}
               </select>
+              {(!CUISINE_TYPES.slice(0, -1).includes(form.cuisineType)) && (
+                <input
+                  type="text"
+                  placeholder="Enter cuisine type (e.g. Mexican, Thai...)"
+                  value={form.cuisineType}
+                  onChange={e => setForm(prev => ({ ...prev, cuisineType: e.target.value }))}
+                  style={{ ...inputStyle, marginTop: '0.5rem' }}
+                />
+              )}
             </div>
           </div>
           <button type="submit" disabled={loading}
