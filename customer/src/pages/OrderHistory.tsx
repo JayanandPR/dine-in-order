@@ -8,16 +8,12 @@ interface OrderItem { name: string; quantity: number; price: number; }
 interface Order { _id: string; status: string; totalAmount: number; orderedAt: string; items: OrderItem[]; }
 interface Bill { _id: string; totalPayableAmount: number; isPaid: boolean; }
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: '#ed8936', preparing: '#4299e1', ready: '#48bb78', served: '#718096', cancelled: '#e53e3e',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  pending:   '⏳ Waiting',
-  preparing: '👨‍🍳 Preparing',
-  ready:     '✅ Ready to serve',
-  served:    '🍽️ Served',
-  cancelled: '❌ Cancelled',
+const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
+  pending:   { color: '#92400E', bg: '#FFF7ED', label: '⏳ Waiting' },
+  preparing: { color: '#1E40AF', bg: '#EFF6FF', label: '👨‍🍳 Preparing' },
+  ready:     { color: '#166534', bg: '#F0FDF4', label: '✅ Ready' },
+  served:    { color: '#4B5563', bg: '#F9FAFB', label: '🍽️ Served' },
+  cancelled: { color: '#991B1B', bg: '#FEF2F2', label: '❌ Cancelled' },
 };
 
 const OrderHistory = () => {
@@ -45,14 +41,9 @@ const OrderHistory = () => {
   }, [tableId]);
 
   const handleWsMessage = useCallback((msg: any) => {
-    if (msg.event === 'order:status_update') {
-      setOrders(prev => prev.map(o =>
-        o._id === msg.payload.orderId ? { ...o, status: msg.payload.status } : o
-      ));
-    }
-    if (msg.event === 'bill:generated') {
-      setBill(msg.payload);
-    }
+    if (msg.event === 'order:status_update')
+      setOrders(prev => prev.map(o => o._id === msg.payload.orderId ? { ...o, status: msg.payload.status } : o));
+    if (msg.event === 'bill:generated') setBill(msg.payload);
   }, []);
 
   useWebSocket(tableId || '', restaurantId || '', handleWsMessage);
@@ -68,83 +59,85 @@ const OrderHistory = () => {
     }
   };
 
-  if (!tableId) return <p style={{ padding: '2rem' }}>Invalid link.</p>;
+  if (!tableId) return <p style={{ padding: '2rem', fontFamily: 'Inter, sans-serif' }}>Invalid link.</p>;
 
   return (
-    <div style={{ maxWidth: '480px', margin: '0 auto', fontFamily: 'sans-serif', background: '#f7fafc', minHeight: '100vh', paddingBottom: '2rem' }}>
+    <div style={{ maxWidth: '480px', margin: '0 auto', fontFamily: 'Inter, sans-serif', background: 'var(--surface-2)', minHeight: '100vh', paddingBottom: '2rem' }}>
       <Navbar restaurantName="My Orders" />
 
       <div style={{ padding: '1rem' }}>
+        {/* Back to menu */}
+        <a href={`/menu?table=${tableId}&restaurant=${restaurantId}`}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--brand)', textDecoration: 'none', fontWeight: 600, fontSize: '0.875rem', marginBottom: '1.25rem' }}>
+          ← Back to Menu
+        </a>
+
         {loading ? (
-          <p style={{ color: '#718096', textAlign: 'center', padding: '2rem' }}>Loading...</p>
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-2)' }}>Loading...</div>
         ) : orders.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '3rem', color: '#718096' }}>
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-3)', background: 'var(--surface)', borderRadius: 'var(--radius)' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🛒</div>
             <p>No orders placed yet.</p>
           </div>
         ) : (
-          orders.map(o => (
-            <div key={o._id} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1rem', marginBottom: '0.75rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '0.8rem', color: '#718096' }}>{new Date(o.orderedAt).toLocaleTimeString()}</span>
-                <span style={{ background: STATUS_COLORS[o.status], color: '#fff', padding: '0.2rem 0.6rem', borderRadius: '10px', fontSize: '0.75rem' }}>
-                  {STATUS_LABELS[o.status] || o.status}
-                </span>
-              </div>
-              {o.items.map((item, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', padding: '0.15rem 0', color: '#4a5568' }}>
-                  <span>{item.name} ×{item.quantity}</span>
-                  <span>₹{item.price * item.quantity}</span>
+          orders.map(o => {
+            const cfg = STATUS_CONFIG[o.status] || STATUS_CONFIG.served;
+            return (
+              <div key={o._id} style={{ background: 'var(--surface)', borderRadius: 'var(--radius)', padding: '1rem', marginBottom: '0.75rem', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-2)' }}>{new Date(o.orderedAt).toLocaleTimeString()}</span>
+                  <span style={{ background: cfg.bg, color: cfg.color, padding: '0.2rem 0.7rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600 }}>
+                    {cfg.label}
+                  </span>
                 </div>
-              ))}
-              <div style={{ borderTop: '1px solid #f7fafc', marginTop: '0.5rem', paddingTop: '0.5rem', display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: '0.9rem' }}>
-                <span>Total</span><span>₹{o.totalAmount}</span>
+                {o.items.map((item, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', padding: '0.2rem 0', color: 'var(--text-2)' }}>
+                    <span>{item.name} <span style={{ color: 'var(--text-3)' }}>×{item.quantity}</span></span>
+                    <span style={{ color: 'var(--text)' }}>₹{item.price * item.quantity}</span>
+                  </div>
+                ))}
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '0.95rem', borderTop: '1px solid var(--border)', paddingTop: '0.6rem', marginTop: '0.5rem', color: 'var(--text)' }}>
+                  <span>Total</span><span>₹{o.totalAmount}</span>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
 
-        {/* Back to menu button */}
-        <a href={`/menu?table=${tableId}&restaurant=${restaurantId}`}
-          style={{ display: 'block', textAlign: 'center', padding: '0.75rem', background: '#2d3748', color: '#fff', borderRadius: '10px', textDecoration: 'none', fontWeight: 600, marginBottom: '1rem' }}>
-          ← Back to Menu
-        </a>
+        {/* Invoice link */}
+        {bill && (
+          <a href={`/invoice/${bill._id}`}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.8rem', background: 'var(--surface)', color: 'var(--brand)', borderRadius: 'var(--radius-sm)', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem', border: '1.5px solid var(--brand)', marginTop: '0.5rem' }}>
+            🧾 View Invoice
+          </a>
+        )}
 
-        {/* Rating section */}
+        {/* Rating */}
         {bill?.isPaid && !rated && (
-          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.25rem', marginTop: '1rem' }}>
-            <h3 style={{ marginTop: 0, marginBottom: '0.75rem', fontSize: '1rem' }}>Rate your experience</h3>
-            <div style={{ display: 'flex', gap: '0.35rem', marginBottom: '0.75rem' }}>
+          <div style={{ background: 'var(--surface)', borderRadius: 'var(--radius)', padding: '1.25rem', marginTop: '1rem', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+            <h3 style={{ fontFamily: 'Playfair Display, serif', marginTop: 0, marginBottom: '0.25rem', fontSize: '1.1rem' }}>How was your experience?</h3>
+            <p style={{ color: 'var(--text-2)', fontSize: '0.8rem', marginBottom: '1rem' }}>Your feedback helps us improve.</p>
+            <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '1rem' }}>
               {[1, 2, 3, 4, 5].map(n => (
                 <button key={n} onClick={() => setRating(n)}
-                  style={{ fontSize: '1.6rem', background: 'none', border: 'none', cursor: 'pointer', opacity: n <= rating ? 1 : 0.25, transition: 'opacity 0.1s' }}>
+                  style={{ fontSize: '1.75rem', background: 'none', border: 'none', cursor: 'pointer', filter: n <= rating ? 'none' : 'grayscale(1)', transform: n <= rating ? 'scale(1.1)' : 'scale(1)', transition: 'all 0.15s' }}>
                   ⭐
                 </button>
               ))}
             </div>
             <textarea value={comment} onChange={e => setComment(e.target.value)}
-              placeholder="Share your thoughts (optional)"
-              style={{ width: '100%', padding: '0.6rem', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '0.875rem', resize: 'vertical', minHeight: '70px', boxSizing: 'border-box', marginBottom: '0.75rem' }} />
+              placeholder="Tell us more (optional)"
+              style={{ width: '100%', padding: '0.75rem', border: '1.5px solid var(--border)', borderRadius: '10px', fontSize: '0.875rem', resize: 'vertical', minHeight: '80px', boxSizing: 'border-box', marginBottom: '0.75rem', fontFamily: 'Inter, sans-serif', outline: 'none', color: 'var(--text)' }} />
             <button onClick={submitRating} disabled={rating === 0}
-              style={{ width: '100%', padding: '0.7rem', background: rating === 0 ? '#cbd5e0' : '#2d3748', color: '#fff', border: 'none', borderRadius: '8px', cursor: rating === 0 ? 'default' : 'pointer', fontWeight: 600 }}>
+              style={{ width: '100%', padding: '0.75rem', background: rating === 0 ? 'var(--border)' : 'var(--brand)', color: '#fff', border: 'none', borderRadius: '10px', cursor: rating === 0 ? 'default' : 'pointer', fontWeight: 700, fontSize: '0.95rem', fontFamily: 'Inter, sans-serif', boxShadow: rating === 0 ? 'none' : '0 4px 12px rgba(200,71,58,0.3)' }}>
               Submit Review
             </button>
           </div>
         )}
 
         {ratingMsg && (
-          <div style={{ background: '#f0fff4', border: '1px solid #9ae6b4', borderRadius: '8px', padding: '0.75rem 1rem', marginTop: '1rem', color: '#276749', textAlign: 'center', fontWeight: 500 }}>
+          <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', padding: '0.875rem 1rem', marginTop: '1rem', color: '#166534', textAlign: 'center', fontWeight: 500 }}>
             {ratingMsg}
-          </div>
-        )}
-
-        {/* Invoice link — show if bill exists */}
-        {bill && (
-          <div style={{ margin: '1rem 0' }}>
-            <a href={`/invoice/${bill._id}`}
-              style={{ display: 'block', textAlign: 'center', padding: '0.75rem', background: '#ebf8ff', color: '#2b6cb0', borderRadius: '10px', textDecoration: 'none', fontWeight: 600, border: '1px solid #90cdf4' }}>
-              🧾 View Invoice
-            </a>
           </div>
         )}
       </div>

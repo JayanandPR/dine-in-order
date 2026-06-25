@@ -14,18 +14,18 @@ const Navbar = ({ restaurantName, cartCount = 0, onCartClick }: Props) => {
   const query = `?table=${tableId}&restaurant=${restaurantId}`;
 
   return (
-    <div style={{ background: '#2d3748', color: '#fff', padding: '0.875rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 50 }}>
+    <div style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)', padding: '0.875rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 50, backdropFilter: 'blur(10px)' }}>
       <div>
-        <div style={{ fontWeight: 700, fontSize: '1rem' }}>{restaurantName || 'Menu'}</div>
+        <div style={{ fontFamily: 'Playfair Display, serif', fontWeight: 700, fontSize: '1.05rem', color: 'var(--text)' }}>{restaurantName || 'Menu'}</div>
       </div>
-      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
         <button onClick={() => navigate(`/orders${query}`)}
-          style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', padding: '0.35rem 0.75rem', cursor: 'pointer', fontSize: '0.8rem' }}>
+          style={{ background: 'var(--surface-2)', color: 'var(--text-2)', border: '1px solid var(--border)', borderRadius: '8px', padding: '0.4rem 0.75rem', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500, fontFamily: 'Inter, sans-serif' }}>
           My Orders
         </button>
         {onCartClick && (
           <button onClick={onCartClick}
-            style={{ background: cartCount > 0 ? '#e53e3e' : 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.35rem 0.75rem', cursor: 'pointer', fontSize: '0.8rem', fontWeight: cartCount > 0 ? 600 : 400 }}>
+            style={{ background: cartCount > 0 ? 'var(--brand)' : 'var(--surface-2)', color: cartCount > 0 ? '#fff' : 'var(--text-2)', border: cartCount > 0 ? 'none' : '1px solid var(--border)', borderRadius: '8px', padding: '0.4rem 0.75rem', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600, transition: 'all 0.15s', fontFamily: 'Inter, sans-serif' }}>
             🛒 {cartCount > 0 ? cartCount : ''}
           </button>
         )}
