@@ -26,19 +26,27 @@ export const getMyRestaurant = asyncHandler(async (req: Request, res: Response) 
 
 // PUT /api/restaurants/mine — admin updates their restaurant
 export const updateRestaurant = asyncHandler(async (req: Request, res: Response) => {
+  const allowedFields = [
+    'name', 'address', 'contactNumber', 'contactEmail',
+    'opensAt', 'closesAt', 'dietType', 'cuisineType', 'logo',
+    'deliveryEnabled', 'deliveryFee', 'minOrderAmount', 'estimatedDeliveryTime',
+  ];
+  const updates: any = {};
+  allowedFields.forEach(f => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
+
   const restaurant = await RestaurantModel.findOneAndUpdate(
     { adminId: req.user!.userId },
-    req.body,
+    updates,
     { new: true, runValidators: true }
   );
   if (!restaurant) { sendError(res, 'Restaurant not found', 404); return; }
   sendSuccess(res, restaurant, 200, 'Updated');
 });
 
-// GET /api/restaurants/:id/public — public info for customers
+// GET /api/restaurants/:id/public
 export const getPublicRestaurant = asyncHandler(async (req: Request, res: Response) => {
   const restaurant = await RestaurantModel.findById(req.params.id)
-    .select('name address cuisineType dietType opensAt closesAt logo averageRating');
+    .select('name address cuisineType dietType opensAt closesAt logo averageRating deliveryEnabled deliveryFee minOrderAmount estimatedDeliveryTime');
   if (!restaurant) { sendError(res, 'Restaurant not found', 404); return; }
   sendSuccess(res, restaurant);
 });

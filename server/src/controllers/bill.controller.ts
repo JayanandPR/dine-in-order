@@ -7,7 +7,7 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess, sendError } from '../utils/response';
 import { broadcastToRestaurant } from '../utils/websocket';
 
-// POST /api/bills — staff generates bill for a table's order
+// POST /api/bills — generate bill
 export const generateBill = asyncHandler(async (req: Request, res: Response) => {
   const { orderId } = req.body;
 

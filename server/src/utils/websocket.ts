@@ -2,7 +2,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { Server } from 'http';
 import { verifyAccessToken } from './jwt';
 
-type WsEventType = 'order:new' | 'order:status_update' | 'table:status_update' | 'bill:generated';
+type WsEventType = 'order:new' | 'order:status_update' | 'table:status_update' | 'bill:generated' | 'delivery:status_update';
 
 interface WsMessage<T = unknown> {
   event: WsEventType;

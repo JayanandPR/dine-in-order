@@ -13,6 +13,10 @@ export interface IRestaurantDocument extends Document {
   averageRating: number;
   noOfTables: number;
   logo?: string;
+  deliveryEnabled: boolean;
+  deliveryFee: number;
+  minOrderAmount: number;
+  estimatedDeliveryTime: number;
   createdAt: Date;
   updatedAt: Date;
   generalQrCode: String;
@@ -32,6 +36,10 @@ const RestaurantSchema = new Schema<IRestaurantDocument>(
     averageRating: { type: Number, default: 0, min: 0, max: 5 },
     noOfTables:    { type: Number, default: 0 },
     logo:          { type: String },
+    deliveryEnabled: { type: Boolean, default: false },
+    deliveryFee:   { type: Number, default: 0 },
+    minOrderAmount:{ type: Number, default: 0 },
+    estimatedDeliveryTime:{ type: Number, default: 30 },
     generalQrCode: { type: String },
   },
   { timestamps: true }
