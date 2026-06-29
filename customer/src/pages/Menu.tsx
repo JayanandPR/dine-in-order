@@ -62,11 +62,19 @@ const Menu = () => {
 
   useWebSocket(tableId || '', restaurantId || '', handleWsMessage);
 
-  if (!tableId || !restaurantId) return (
+  if (!restaurantId) return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center', background: 'var(--surface-2)' }}>
       <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📵</div>
       <h2 style={{ fontFamily: 'Playfair Display, serif' }}>Invalid QR Code</h2>
-      <p style={{ color: 'var(--text-2)', marginTop: '0.5rem' }}>Scan a valid table QR code to order.</p>
+      <p style={{ color: 'var(--text-2)', marginTop: '0.5rem' }}>Scan a valid restaurant QR code to order.</p>
+    </div>
+  );
+
+  if (!isDelivery && !tableId) return (
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center', background: 'var(--surface-2)' }}>
+      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📵</div>
+      <h2 style={{ fontFamily: 'Playfair Display, serif' }}>No Table Selected</h2>
+      <p style={{ color: 'var(--text-2)', marginTop: '0.5rem' }}>Please scan a table QR code or go back and select a table.</p>
     </div>
   );
 
