@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Orders from './pages/Orders';
+import Deliveries from './pages/Deliveries';
 import OrderHistory from './pages/OrderHistory';
 import Tables from './pages/Tables';
 import Profile from './pages/Profile';
@@ -15,6 +16,7 @@ const App = () => (
         <Route path="/login" element={<Login />} />
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route path="/orders"  element={<Orders />} />
+          <Route path="/deliveries" element={<Deliveries />} />
           <Route path="/history" element={<OrderHistory />} />
           <Route path="/tables"  element={<Tables />} />
           <Route path="/profile" element={<Profile />} />

@@ -6,10 +6,9 @@ export const useWebSocket = (restaurantId: string, onMessage: WsHandler) => {
   const wsRef = useRef<WebSocket | null>(null);
 
   const connect = useCallback(() => {
-    const token = localStorage.getItem('accessToken');
-    if (!token || !restaurantId) return;
-
+    if (!restaurantId) return;
     const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000/ws';
+    const token = localStorage.getItem('accessToken');
     const ws = new WebSocket(`${WS_URL}?token=${token}&restaurantId=${restaurantId}`);
     wsRef.current = ws;
 
@@ -18,7 +17,6 @@ export const useWebSocket = (restaurantId: string, onMessage: WsHandler) => {
     };
 
     ws.onclose = () => {
-      // Reconnect after 3s on unexpected close
       setTimeout(connect, 3000);
     };
   }, [restaurantId, onMessage]);
