@@ -19,6 +19,13 @@ const FALLBACK_IMAGES = {
 const Menu = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
+
+  const orderType = params.get('orderType') || sessionStorage.getItem('orderType') || 'dine-in';
+  const isDelivery = orderType === 'delivery';
+  const deliveryAddress = sessionStorage.getItem('deliveryAddress') || '';
+  const deliveryPhone = sessionStorage.getItem('deliveryPhone') || '';
+  const deliveryNote = sessionStorage.getItem('deliveryNote') || '';
+
   const restaurantId = params.get('restaurant') || sessionStorage.getItem('restaurantId');
   const tableId = params.get('table') || sessionStorage.getItem('tableId');
 
@@ -74,8 +81,15 @@ const Menu = () => {
   const addToCart = async (item: FoodItem) => {
     setAddingId(item._id);
     try {
-      await api.post('/cart', { tableId, foodItemId: item._id, quantity: 1 });
-      const updated = await api.get(`/cart/${tableId}`);
+      await api.post('/cart', {
+        tableId: isDelivery ? undefined : tableId,
+        foodItemId: item._id,
+        quantity: 1,
+        orderType,
+        restaurantId,
+        deliveryDetails: isDelivery ? { address: deliveryAddress, phone: deliveryPhone, note: deliveryNote } : undefined,
+      });
+      const updated = await api.get(`/cart/${isDelivery ? `delivery/${restaurantId}` : tableId}`);
       setCart(updated.data.data);
     } catch (err: any) { alert(err.response?.data?.message || 'Could not add item'); }
     finally { setAddingId(null); }
@@ -97,11 +111,26 @@ const Menu = () => {
     if (!cart.length) return;
     setPlacing(true);
     try {
-      await api.post('/orders', { tableId });
+      const res = await api.post('/orders', {
+        tableId: isDelivery ? undefined : tableId,
+        restaurantId,
+        orderType,
+        deliveryDetails: isDelivery ? {
+          address: deliveryAddress,
+          phone: deliveryPhone,
+          note: deliveryNote,
+        } : undefined,
+      });
+      const orderId = res.data.data._id;
       setCart([]);
       setOrderPlaced(true);
-      setOrderStatus('pending');
       setShowCart(false);
+      if (isDelivery) {
+        // Go to tracking page for delivery orders
+        navigate(`/track/${orderId}?restaurant=${restaurantId}`);
+      } else {
+        setOrderStatus('pending');
+      }
     } catch (err: any) { alert(err.response?.data?.message || 'Error placing order'); }
     finally { setPlacing(false); }
   };
@@ -154,6 +183,15 @@ const Menu = () => {
   return (
     <div style={{ maxWidth: '480px', margin: '0 auto', background: 'var(--surface-2)', minHeight: '100vh', paddingBottom: '6rem', fontFamily: 'Inter, sans-serif' }}>
       <Navbar restaurantName={restaurant?.name} cartCount={cart.length} onCartClick={() => setShowCart(true)} />
+      
+      {/* Delivery banner */}
+      {isDelivery && (
+        <div style={{ background: '#F5F3FF', borderBottom: '1px solid #DDD6FE', padding: '0.75rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: '#6D28D9' }}>
+          <span>🛵</span>
+          <span style={{ fontWeight: 500 }}>Delivering to:</span>
+          <span style={{ color: 'var(--text-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{deliveryAddress}</span>
+        </div>
+      )}
 
       {/* Status banner */}
       {orderStatus && statusBanner[orderStatus] && (
@@ -310,13 +348,25 @@ const Menu = () => {
             </div>
 
             <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                <span style={{ color: 'var(--text-2)', fontSize: '0.875rem' }}>Subtotal</span>
+                <span style={{ color: 'var(--text)', fontSize: '0.875rem' }}>₹{cartTotal.toFixed(2)}</span>
+              </div>
+              {isDelivery && restaurant && (restaurant as any).deliveryFee > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                  <span style={{ color: 'var(--text-2)', fontSize: '0.875rem' }}>Delivery fee</span>
+                  <span style={{ color: '#6D28D9', fontSize: '0.875rem' }}>₹{(restaurant as any).deliveryFee}</span>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', paddingTop: '0.4rem', borderTop: '1px solid var(--border)' }}>
                 <span style={{ color: 'var(--text-2)', fontSize: '0.9rem' }}>Total</span>
-                <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text)' }}>₹{cartTotal.toFixed(2)}</span>
+                <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text)' }}>
+                  ₹{(cartTotal + (isDelivery && restaurant ? (restaurant as any).deliveryFee : 0)).toFixed(2)}
+                </span>
               </div>
               <button onClick={placeOrder} disabled={placing}
-                style={{ width: '100%', padding: '0.9rem', background: placing ? 'var(--border)' : 'var(--brand)', color: '#fff', border: 'none', borderRadius: 'var(--radius-sm)', cursor: placing ? 'default' : 'pointer', fontWeight: 700, fontSize: '1rem', boxShadow: placing ? 'none' : '0 4px 16px rgba(200,71,58,0.35)', fontFamily: 'Inter, sans-serif' }}>
-                {placing ? 'Placing order...' : 'Place Order'}
+                style={{ width: '100%', padding: '0.9rem', background: placing ? 'var(--border)' : isDelivery ? '#6D28D9' : 'var(--brand)', color: '#fff', border: 'none', borderRadius: 'var(--radius-sm)', cursor: placing ? 'default' : 'pointer', fontWeight: 700, fontSize: '1rem', fontFamily: 'Inter, sans-serif' }}>
+                {placing ? 'Placing order...' : isDelivery ? '🛵 Place Delivery Order' : 'Place Order'}
               </button>
             </div>
           </div>

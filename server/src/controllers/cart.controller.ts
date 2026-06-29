@@ -12,6 +12,16 @@ export const getCart = asyncHandler(async (req: Request, res: Response) => {
   sendSuccess(res, items);
 });
 
+// GET /api/cart/delivery/:restaurantId — get delivery cart
+export const getDeliveryCart = asyncHandler(async (req: Request, res: Response) => {
+  const items = await CartItemModel.find({
+    restaurantId: req.params.restaurantId,
+    orderType: 'delivery',
+    isOrdered: false,
+  }).populate('foodItemId', 'name price image dietType');
+  sendSuccess(res, items);
+});
+
 // POST /api/cart — add item to cart
 export const addToCart = asyncHandler(async (req: Request, res: Response) => {
   const { tableId, foodItemId, quantity, orderType = 'dine-in', restaurantId, deliveryDetails } = req.body;

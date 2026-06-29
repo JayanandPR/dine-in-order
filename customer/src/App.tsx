@@ -4,6 +4,7 @@ import Menu from './pages/Menu';
 import OrderHistory from './pages/OrderHistory';
 import ThankYou from './pages/ThankYou';
 import Invoice from './pages/Invoice';
+import DeliveryTracking from './pages/DeliveryTracking';
 
 const App = () => (
   <BrowserRouter>
@@ -13,6 +14,7 @@ const App = () => (
       <Route path="/orders"  element={<OrderHistory />} />
       <Route path="/thankyou" element={<ThankYou />} />
       <Route path="/invoice/:billId" element={<Invoice />} />
+      <Route path="/track/:orderId"  element={<DeliveryTracking />} />
       <Route path="*" element={<Navigate to="/menu" replace />} />
     </Routes>
   </BrowserRouter>
