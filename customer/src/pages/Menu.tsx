@@ -43,16 +43,19 @@ const Menu = () => {
   const [addingId, setAddingId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!restaurantId || !tableId) return;
+    if (!restaurantId) return;
+    if (!isDelivery && !tableId) return;
     api.get(`/restaurants/${restaurantId}/public`).then(r => setRestaurant(r.data.data)).catch(() => setError('Invalid restaurant'));
     api.get(`/menu/${restaurantId}/categories`).then(r => { setCategories(r.data.data); if (r.data.data[0]) setActiveCategory(r.data.data[0]._id); });
     api.get(`/menu/${restaurantId}/items`).then(r => setItems(r.data.data));
-    api.get(`/cart/${tableId}`).then(r => setCart(r.data.data)).catch(() => {});
-    api.get(`/bills/table/${tableId}`).then(r => { if (r.data.data) setBill(r.data.data); }).catch(() => {});
-    api.get(`/orders/table/${tableId}`).then(r => {
-      const active = r.data.data.find((o: any) => !['served', 'cancelled'].includes(o.status));
-      if (active) setOrderStatus(active.status);
-    }).catch(() => {});
+    if (!isDelivery && tableId) {
+      api.get(`/cart/${tableId}`).then(r => setCart(r.data.data)).catch(() => {});
+      api.get(`/bills/table/${tableId}`).then(r => { if (r.data.data) setBill(r.data.data); }).catch(() => {});
+      api.get(`/orders/table/${tableId}`).then(r => {
+        const active = r.data.data.find((o: any) => !['served', 'cancelled'].includes(o.status));
+        if (active) setOrderStatus(active.status);
+      }).catch(() => {});
+    }
   }, [restaurantId, tableId]);
 
   const handleWsMessage = useCallback((msg: any) => {
