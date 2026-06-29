@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import RestaurantList from './pages/RestaurantList';
 import Home from './pages/Home';
 import Menu from './pages/Menu';
 import OrderHistory from './pages/OrderHistory';
@@ -9,13 +10,13 @@ import DeliveryTracking from './pages/DeliveryTracking';
 const App = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/home" element={<Home />} />
-      <Route path="/menu" element={<Menu />} />
-      <Route path="/orders"  element={<OrderHistory />} />
-      <Route path="/thankyou" element={<ThankYou />} />
+      <Route path="/"                element={<RestaurantList />} />
+      <Route path="/home"            element={<Home />} />
+      <Route path="/menu"            element={<Menu />} />
+      <Route path="/orders"          element={<OrderHistory />} />
+      <Route path="/thankyou"        element={<ThankYou />} />
       <Route path="/invoice/:billId" element={<Invoice />} />
       <Route path="/track/:orderId"  element={<DeliveryTracking />} />
-      <Route path="*" element={<Navigate to="/menu" replace />} />
     </Routes>
   </BrowserRouter>
 );

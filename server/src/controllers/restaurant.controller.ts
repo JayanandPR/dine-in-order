@@ -73,3 +73,11 @@ export const getPublicTables = asyncHandler(async (req: Request, res: Response) 
     .sort('tableNo');
   sendSuccess(res, tables);
 });
+
+// GET /api/restaurants/all — public listing of all restaurants
+export const getAllRestaurants = asyncHandler(async (_req: Request, res: Response) => {
+  const restaurants = await RestaurantModel.find()
+    .select('name address cuisineType dietType averageRating logo opensAt closesAt deliveryEnabled')
+    .sort({ createdAt: -1 });
+  sendSuccess(res, restaurants);
+});

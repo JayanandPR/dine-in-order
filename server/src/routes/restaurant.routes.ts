@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import {
   createRestaurant, getMyRestaurant, updateRestaurant,
-  getPublicRestaurant, generateGeneralQR, getPublicTables,
+  getPublicRestaurant, generateGeneralQR, getPublicTables, getAllRestaurants,
 } from '../controllers/restaurant.controller';
 import { authenticate, authorize } from '../middleware/auth.middleware';
 
 const router = Router();
 
+router.get('/all', getAllRestaurants);
 router.get('/:id/public',         getPublicRestaurant);
 router.get('/:id/tables/public',  getPublicTables);
 router.post('/',                  authenticate, authorize('admin'), createRestaurant);
