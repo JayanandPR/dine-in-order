@@ -18,7 +18,7 @@ export interface ICartItemDocument extends Document {
 const CartItemSchema = new Schema<ICartItemDocument>(
   {
     restaurantId: { type: Schema.Types.ObjectId, ref: 'Restaurant', required: true },
-    tableId:      { type: Schema.Types.ObjectId, ref: 'Table', required: true },
+    tableId:      { type: Schema.Types.ObjectId, ref: 'Table' },
     foodItemId:   { type: Schema.Types.ObjectId, ref: 'FoodItem', required: true },
     quantity:     { type: Number, required: true, min: 1 },
     totalPrice:   { type: Number, required: true },
