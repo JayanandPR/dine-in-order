@@ -13,6 +13,7 @@ import Orders from './pages/Orders';
 import Bills from './pages/Bills';
 import Analytics from './pages/Analytics';
 import Ratings from './pages/Ratings';
+import Deliveries from './pages/Deliveries';
 
 const App = () => (
   <BrowserRouter>
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/menu"       element={<Menu />} />
           <Route path="/tables"     element={<Tables />} />
           <Route path="/staff"      element={<Staff />} />
+          <Route path="/deliveries" element={<Deliveries />} />
           <Route path="/orders"     element={<Orders />} />
           <Route path="/bills"      element={<Bills />} />
           <Route path="/analytics" element={<Analytics />} />
