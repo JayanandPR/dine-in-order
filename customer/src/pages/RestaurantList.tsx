@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import MarketingNav from '../components/marketing/MarketingNav';
+import Footer from '../components/marketing/Footer';
 
 interface Restaurant {
   _id: string;
@@ -56,7 +58,8 @@ const RestaurantList = () => {
   };
 
   return (
-    <div style={{ maxWidth: '480px', margin: '0 auto', minHeight: '100vh', background: 'var(--surface-2)', fontFamily: 'Inter, sans-serif', paddingBottom: '2rem' }}>
+    <div style={{ maxWidth: '1100px', margin: '0 auto', minHeight: '100vh', background: 'var(--surface-2)', fontFamily: 'Inter, sans-serif', paddingBottom: '2rem' }}>
+      <MarketingNav />
 
       {/* Hero */}
       <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
@@ -177,6 +180,7 @@ const RestaurantList = () => {
           ))
         )}
       </div>
+      <Footer />
     </div>
   );
 };

@@ -1,4 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Landing from './pages/marketing/Landing';
+import About from './pages/marketing/About';
+import Pricing from './pages/marketing/Pricing';
+import Contact from './pages/marketing/Contact';
+import FAQ from './pages/marketing/FAQ';
 import RestaurantList from './pages/RestaurantList';
 import Home from './pages/Home';
 import Menu from './pages/Menu';
@@ -10,7 +15,17 @@ import DeliveryTracking from './pages/DeliveryTracking';
 const App = () => (
   <BrowserRouter>
     <Routes>
-      <Route path="/"                element={<RestaurantList />} />
+      {/* Marketing site */}
+      <Route path="/"          element={<Landing />} />
+      <Route path="/about"     element={<About />} />
+      <Route path="/pricing"   element={<Pricing />} />
+      <Route path="/contact"   element={<Contact />} />
+      <Route path="/faq"       element={<FAQ />} />
+
+      {/* Restaurant listing */}
+      <Route path="/restaurants" element={<RestaurantList />} />
+
+      {/* Ordering flow — unchanged */}
       <Route path="/home"            element={<Home />} />
       <Route path="/menu"            element={<Menu />} />
       <Route path="/orders"          element={<OrderHistory />} />
